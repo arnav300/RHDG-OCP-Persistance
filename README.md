@@ -33,7 +33,7 @@ testapp-0   1/1       Running   0          9m
 [quicklab@master-0 createcache]$ 
 ~~~
 
-- Building the Hello World Quickstart :
+# Building the Hello World Quickstart :
 
 1. Create a new binary build on OpenShift.
 
@@ -52,3 +52,46 @@ Artifacts are built in the target directory.
 ~~~
 $ oc start-build quickstart --from-dir=target/ --follow
 ~~~
+
+# Running the Hello World Quickstart :
+
+1. Invoke cache operations with the quickstart application.
+
+~~~
+$ oc run quickstart --image=`oc get is quickstart -o jsonpath="{.status.dockerImageRepository}"` \
+    --replicas=1 --restart=OnFailure --env APP_NAME=${appName} --env SVC_DNS_NAME=${appName} --env JAVA_OPTIONS=-ea
+~~~
+Where ${appName} matches the application name that you specified when you created cache-service or datagrid-service.
+
+In this example, below command is used :
+
+~~~
+oc run quickstart --image=`oc get is quickstart -o jsonpath="{.status.dockerImageRepository}"` --replicas=1 --restart=OnFailure --env APP_NAME=testapp  --env CMD=get-cache  --env JAVA_OPTIONS=-ea
+~~~
+
+2. Verify the cache operations completed successfully.
+~~~
+$ oc logs quickstart-${id} --tail=50
+--- Connect to datagrid-service ---
+...
+--- Store key='hello'/value='world' pair ---
+...
+--- Retrieve key='hello' ---
+--- Value is 'world' ---
+~~~
+Where ${id} is the unique ID for the pod. TIP: Use oc get pods to find the pod name.
+
+The preceding log messages show the Hello World quickstart connected to the Data Grid for OpenShift service and stored a hello/world key/value pair. The quickstart application also performs an assertion to ensure that the returned value is world.
+
+You've successfully completed this tutorial!
+
+Do one of the following:
+
+Delete quickstart resources and continue using the project with RHDG for OpenShift.
+
+$ oc delete all --selector=run=quickstart || true
+$ oc delete imagestream quickstart || true
+$ oc delete buildconfig quickstart || true
+Delete the project to remove all resources, for example:
+
+$ oc delete project my_project
