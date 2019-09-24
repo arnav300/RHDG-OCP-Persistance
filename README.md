@@ -33,4 +33,22 @@ testapp-0   1/1       Running   0          9m
 [quicklab@master-0 createcache]$ 
 ~~~
 
-#Building the Hello World Quickstart
+- Building the Hello World Quickstart :
+
+1. Create a new binary build on OpenShift.
+
+~~~
+$ oc new-build --binary --strategy=source --name=quickstart -l app=quickstart fabric8/s2i-java:2.3
+~~~
+
+2. Build the Hello World quickstart.
+~~~
+$ mvn -s ../../../settings.xml clean package compile -DincludeScope=runtime
+~~~
+
+Artifacts are built in the target directory.
+
+3. Start the build on OpenShift.
+~~~
+$ oc start-build quickstart --from-dir=target/ --follow
+~~~
